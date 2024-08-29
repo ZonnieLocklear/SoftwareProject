@@ -1,0 +1,64 @@
+/* Style for the body to ensure full-page centering and background color */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+/* Style for the main container to center text */
+.container {
+    text-align: center;
+}
+
+/* Style for the header to make it prominent */
+header h1 {
+    font-size: 48px;
+    font-weight: bold;
+    color: #202124;
+    margin-bottom: 20px;
+}
+
+/* Style for forms to align items vertically */
+form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+/* Style for text and password input fields */
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+    width: 300px;
+    padding: 10px;
+    font-size: 18px;
+    border: 1px solid #ddd;
+    border-radius: 24px;
+    margin: 5px 0;
+    outline: none;
+}
+
+/* Style for buttons to make them look clickable */
+button {
+    padding: 10px 20px;
+    font-size: 18px;
+    background-color: #4285f4;
+    color: white;
+    border: none;
+    border-radius: 24px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 10px;
+}
+
+/* Hover effect for buttons to enhance interactivity */
+button:hover {
+    background-color: #357ae8;
+}

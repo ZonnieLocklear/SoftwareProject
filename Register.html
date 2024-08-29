@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Metadata for character set and responsiveness -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Page Title -->
+    <title>Register - InnovativeAI</title>
+    
+    <!-- Link to external CSS file for styling -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Main container for the registration page -->
+    <div class="container">
+        <header> 
+            <h1>Register for InnovativeAI</h1> <!-- Page Header -->
+        </header>
+        
+        <main>
+            <!-- Registration form -->
+		<form id="registration-form" action="http://localhost:3000/register" method="POST" onsubmit="return validateRegistrationForm()">               
+		 <!-- Username input field -->
+                <input type="text" id="reg-username" placeholder="Username" required>
+
+                <!-- Email input field -->
+                <input type="email" id="reg-email" placeholder="Email" required>
+
+                <!-- Password input field -->
+                <input type="password" id="reg-password" placeholder="Password" required>
+
+                <!-- Confirm Password input field -->
+                <input type="password" id="reg-confirm-password" placeholder="Confirm Password" required>
+
+                <!-- Submit button -->
+                <button type="submit">Register</button>
+            </form>
+
+            <!-- Link to the Login page if the user already has an account -->
+            <p>Already have an account? <a href="Login.html">Login here</a></p>
+        </main>
+    </div>
+
+    <!-- JavaScript for form validation -->
+    <script>
+        function validateRegistrationForm() {
+            // Get values from the password fields
+            var password = document.getElementById("reg-password").value;
+            var confirmPassword = document.getElementById("reg-confirm-password").value;
+            
+            // Check if both passwords match
+            if (password !== confirmPassword) {
+                alert("Passwords do not match."); // Display alert if passwords don't match
+                return false; // Prevent form submission
+            }
+            return true; // Allow form submission if validation passes
+        }
+    </script>
+</body>
+</html>
