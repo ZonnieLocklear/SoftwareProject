@@ -59,8 +59,7 @@ app.post('/register', async (req, res) => {
         const newUser = new User({ username, password: hashedPassword });
         await newUser.save();
 
-        // Redirect to homepage after successful registration
-        res.redirect('/');  // Redirect to homepage
+        res.redirect('/index.html'); // Redirect to login page after successful registration
     } catch (error) {
         console.error('Error registering user:', error.message);  // More detailed error logging
         res.status(500).send(`Error registering user: ${error.message}`);
@@ -78,7 +77,8 @@ app.post('/login', async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).send('Invalid credentials');
 
-        res.send('User logged in successfully');
+        // Redirect to the homepage upon successful login
+        res.redirect('/Homepage.html');
     } catch (error) {
         console.error('Error logging in user:', error.message);  // More detailed error logging
         res.status(500).send('Error logging in user');
