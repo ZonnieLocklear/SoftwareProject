@@ -12,8 +12,8 @@ const PORT = process.env.PORT || 3000;
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-// ** Serve Static Files **
-app.use(express.static(__dirname)); // This will serve all files in the current directory
+// Serve static files
+app.use(express.static(__dirname));  // Serves all static files (HTML, CSS, JS) in the root directory
 
 // MongoDB connection using environment variable
 const uri = process.env.MONGODB_URI;
@@ -34,12 +34,16 @@ const User = mongoose.model('User', userSchema);
 
 // Routes
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/index.html'); // Serve the login page as the main page
+    res.sendFile(__dirname + '/index.html');  // Serve the main HTML file
 });
 
 app.post('/register', async (req, res) => {
     const { username, password } = req.body;
     console.log('Received registration data:', { username, password });  // Log the incoming data
+
+    if (!username || !password) {
+        return res.status(400).send('Username and password are required');
+    }
 
     try {
         // Check if user already exists
