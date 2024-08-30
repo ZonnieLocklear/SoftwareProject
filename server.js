@@ -59,7 +59,8 @@ app.post('/register', async (req, res) => {
         const newUser = new User({ username, password: hashedPassword });
         await newUser.save();
 
-        res.status(201).send('User registered successfully');
+        // Redirect to homepage after successful registration
+        res.redirect('/');  // Redirect to homepage
     } catch (error) {
         console.error('Error registering user:', error.message);  // More detailed error logging
         res.status(500).send(`Error registering user: ${error.message}`);
