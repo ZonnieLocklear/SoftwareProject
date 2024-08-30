@@ -12,6 +12,9 @@ const PORT = process.env.PORT || 3000;
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+// ** Serve Static Files **
+app.use(express.static(__dirname)); // This will serve all files in the current directory
+
 // MongoDB connection using environment variable
 const uri = process.env.MONGODB_URI;
 mongoose.connect(uri, {
@@ -31,7 +34,7 @@ const User = mongoose.model('User', userSchema);
 
 // Routes
 app.get('/', (req, res) => {
-    res.send('Welcome to InnovativeAI');
+    res.sendFile(__dirname + '/index.html'); // Serve the login page as the main page
 });
 
 app.post('/register', async (req, res) => {
