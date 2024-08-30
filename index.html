@@ -13,9 +13,10 @@
         </header>
         <main>
             <!-- Login form with action attribute pointing to the backend -->
+            <!-- Added name attributes to the input fields to match the backend expectation -->
             <form id="login-form" action="http://localhost:3000/login" method="POST" onsubmit="return validateForm()">
-                <input type="text" id="username" placeholder="Username" required>
-                <input type="password" id="password" placeholder="Password" required>
+                <input type="text" name="username" id="username" placeholder="Username" required>
+                <input type="password" name="password" id="password" placeholder="Password" required>
                 <button type="submit">Login</button>
             </form>
             <p>Don't have an account? <a href="Register.html">Register here</a></p>
