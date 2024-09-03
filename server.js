@@ -4,7 +4,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const bodyParser = require('body-parser');
-const crypto = require('crypto');  // For generating reset tokens
+const crypto = require('crypto');  // Use the built-in crypto module
 const nodemailer = require('nodemailer');  // For sending emails
 
 const app = express();
