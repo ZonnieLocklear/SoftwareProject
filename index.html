@@ -12,14 +12,15 @@
             <h1>Welcome to InnovativeAI</h1>
         </header>
         <main>
-            <!-- Login form with action attribute pointing to the backend -->
-            <!-- Added name attributes to the input fields to match the backend expectation -->
+            <!-- Login form -->
             <form id="login-form" action="http://localhost:3000/login" method="POST" onsubmit="return validateForm()">
-                <input type="text" name="username" id="username" placeholder="Username" required>
-                <input type="password" name="password" id="password" placeholder="Password" required>
+                <input type="text" id="username" placeholder="Username" name="username" required>
+                <input type="password" id="password" placeholder="Password" name="password" required>
                 <button type="submit">Login</button>
             </form>
             <p>Don't have an account? <a href="Register.html">Register here</a></p>
+            <!-- Forgot Password link -->
+            <p><a href="forgot_password.html">Forgot your password?</a></p> <!-- Added this line -->
         </main>
     </div>
 
