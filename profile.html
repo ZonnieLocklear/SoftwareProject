@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - InnovativeAI</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Your Profile</h1>
+        </header>
+        <main>
+            <!-- Profile form -->
+            <form id="profile-form" action="http://localhost:3000/profile" method="POST" onsubmit="return validateProfileForm()">
+                <input type="text" id="profile-username" name="username" placeholder="Username" required readonly> <!-- Read-only username -->
+                <input type="email" id="profile-email" name="email" placeholder="Email" required>
+                <input type="password" id="profile-new-password" name="newPassword" placeholder="New Password (optional)">
+                <button type="submit">Update Profile</button>
+            </form>
+
+            <!-- Link to Logout or go back to homepage -->
+            <p><a href="index.html">Logout</a> | <a href="homepage.html">Go back to Homepage</a></p>
+        </main>
+    </div>
+
+    <!-- JavaScript for form validation -->
+    <script>
+        function validateProfileForm() {
+            var email = document.getElementById("profile-email").value;
+            if (email == "") {
+                alert("Email is required.");
+                return false;
+            }
+            return true;
+        }
+
+        // Example of setting username from localStorage or session storage
+        document.addEventListener("DOMContentLoaded", function() {
+            var username = "YourUsername"; // Replace with actual data
+            document.getElementById("profile-username").value = username;
+        });
+    </script>
+</body>
+</html>
