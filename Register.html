@@ -1,18 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Metadata for character set and responsiveness -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- Page Title -->
     <title>Register - InnovativeAI</title>
-    
-    <!-- Link to external CSS file for styling -->
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Main container for the registration page -->
     <div class="container">
         <header> 
             <h1>Register for InnovativeAI</h1> <!-- Page Header -->
@@ -20,7 +14,7 @@
         
         <main>
             <!-- Registration form -->
-            <form id="registration-form" action="http://localhost:3000/register" method="POST" onsubmit="return validateRegistrationForm()">               
+            <form id="registration-form" action="http://localhost:3000/register" method="POST" onsubmit="return handleRegistration(event)">
                 <!-- Username input field -->
                 <input type="text" id="reg-username" name="username" placeholder="Username" required>
 
@@ -37,6 +31,9 @@
                 <button type="submit">Register</button>
             </form>
 
+            <!-- Error message display area -->
+            <p id="error-message" style="color: red;"></p>
+
             <!-- Link to the Login page if the user already has an account -->
             <p>Already have an account? <a href="index.html">Login here</a></p>
         </main>
@@ -44,17 +41,43 @@
 
     <!-- JavaScript for form validation -->
     <script>
-        function validateRegistrationForm() {
-            // Get values from the password fields
-            var password = document.getElementById("reg-password").value;
-            var confirmPassword = document.getElementById("reg-confirm-password").value;
-            
-            // Check if both passwords match
+        function handleRegistration(event) {
+            event.preventDefault();  // Prevent the form from submitting normally
+
+            const username = document.getElementById("reg-username").value;
+            const email = document.getElementById("reg-email").value;
+            const password = document.getElementById("reg-password").value;
+            const confirmPassword = document.getElementById("reg-confirm-password").value;
+
             if (password !== confirmPassword) {
-                alert("Passwords do not match."); // Display alert if passwords don't match
-                return false; // Prevent form submission
+                displayError('Passwords do not match.');
+                return;
             }
-            return true; // Allow form submission if validation passes
+
+            // Send a POST request using Fetch API
+            fetch('http://localhost:3000/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, email, password }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    displayError(data.error);  // Display error message if there is an error
+                } else {
+                    window.location.href = '/';  // Redirect to login page if registration is successful
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                displayError('An unexpected error occurred. Please try again.');
+            });
+        }
+
+        function displayError(message) {
+            document.getElementById('error-message').textContent = message;
         }
     </script>
 </body>
