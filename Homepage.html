@@ -27,10 +27,20 @@
                 <!-- Submit button -->
                 <button type="submit">Get Suggestions</button>
             </form>
+            
+            <!-- Button to navigate to Profile page -->
+            <div class="button-container">
+                <button onclick="navigateToProfile()">My Profile</button>
+            </div>
         </main>
     </div>
     
-    <!-- JavaScript for handling suggestions (if needed) -->
+    <!-- JavaScript for handling suggestions and navigation -->
     <script src="app.js"></script>
+    <script>
+        function navigateToProfile() {
+            window.location.href = 'profile.html'; //
+        }
+    </script>
 </body>
 </html>
