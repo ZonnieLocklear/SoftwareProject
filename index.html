@@ -3,37 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - InnovativeAI</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Welcome to InnovativeAI</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Link to global styles -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css"> <!-- Bootstrap for styling -->
 </head>
 <body>
     <div class="container">
         <header>
             <h1>Welcome to InnovativeAI</h1>
+            <p class="intro-text">
+                Your intelligent assistant for all your needs, from answering questions to generating creative ideas.
+                Join us and experience the power of artificial intelligence!
+            </p>
         </header>
+        
         <main>
+            <!-- Highlighting the registration and login options -->
+            <div class="info-section">
+                <p>Get instant access to:</p>
+                <ul class="feature-list">
+                    <li><i class="fas fa-brain"></i> Intelligent insights and answers</li>
+                    <li><i class="fas fa-lightbulb"></i> Creative idea generation</li>
+                    <li><i class="fas fa-cogs"></i> Personalized recommendations</li>
+                </ul>
+                <p>Ready to explore? <a href="register.html" class="cta-link">Create your free profile now!</a></p>
+            </div>
+
             <!-- Login form -->
-            <form id="login-form" action="http://localhost:3000/login" method="POST" onsubmit="return validateForm()">
-                <input type="text" id="username" placeholder="Username" name="username" required>
-                <input type="password" id="password" placeholder="Password" name="password" required>
-                <button type="submit">Login</button>
+            <form id="login-form" onsubmit="return handleLogin(event)">
+                <input type="text" id="username" name="username" placeholder="Username or Email" required>
+                <input type="password" id="password" name="password" placeholder="Password" required>
+                <button type="submit"><i class="fas fa-sign-in-alt"></i> Login</button>
             </form>
-            <p>Don't have an account? <a href="Register.html">Register here</a></p>
-            <!-- Forgot Password link -->
-            <p><a href="forgot-password.html">Forgot your password?</a></p> <!-- Added this line -->
+
+            <!-- Error message display area -->
+            <p id="error-message" class="error-message"></p>
+
+            <div class="links">
+                <p>Don't have an account? <a href="register.html">Register here</a></p>
+                <p><a href="forgot-password.html">Forgot Password?</a></p>
+            </div>
         </main>
     </div>
 
+    <!-- JavaScript for handling login -->
     <script>
-        function validateForm() {
-            var username = document.getElementById("username").value;
-            var password = document.getElementById("password").value;
-            if (username == "" || password == "") {
-                alert("Both fields are required.");
-                return false;
-            }
-            return true;
+        // Function to handle the login process
+        function handleLogin(event) {
+            event.preventDefault();  // Prevent the form from submitting normally
+
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            // Send a POST request using Fetch API
+            fetch('http://localhost:3000/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    displayError(data.error);  // Display error message if there is an error
+                } else if (data.success) {
+                    window.location.href = data.redirectUrl;  // Redirect to homepage if login is successful
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                displayError('An unexpected error occurred. Please try again.');
+            });
+        }
+
+        // Function to display error messages
+        function displayError(message) {
+            const errorMessage = document.getElementById('error-message');
+            errorMessage.textContent = message; // Display the error message
+            errorMessage.classList.add('error-message');
         }
     </script>
+    <!-- Bootstrap and Font Awesome Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
