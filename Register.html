@@ -4,9 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - InnovativeAI</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css"> <!-- Link to shared styles.css -->
 </head>
 <body>
+    <!-- Navigation bar at the top of the page -->
+    <div class="navbar">
+        <a href="homepage.html">InnovativeAI</a> <!-- Home link (logo or website name) -->
+        <div class="nav-right">
+            <a href="index.html">Login</a> <!-- Login link -->
+        </div>
+    </div>
+
     <div class="container">
         <header> 
             <h1>Register for InnovativeAI</h1> <!-- Page Header -->
@@ -32,7 +40,7 @@
             </form>
 
             <!-- Error message display area -->
-            <p id="error-message" style="color: red;"></p>
+            <p id="error-message" class="error-message"></p>
 
             <!-- Link to the Login page if the user already has an account -->
             <p>Already have an account? <a href="index.html">Login here</a></p>
@@ -65,7 +73,8 @@
             .then(response => response.json())
             .then(data => {
                 if (data.error) {
-                    displayError(data.error);  // Display error message if there is an error
+                // Display error message if there is an error
+                    displayError(data.error); 
                 } else {
                     window.location.href = '/';  // Redirect to login page if registration is successful
                 }
