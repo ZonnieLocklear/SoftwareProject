@@ -1,46 +1,251 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Metadata for character set and responsiveness -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- Page Title -->
     <title>InnovativeAI</title>
-    
-    <!-- Link to external CSS file for styling -->
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Existing styles */
+        body, html {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #333;
+            padding: 10px;
+            color: white;
+        }
+
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 8px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-grow: 1;
+            justify-content: start;
+            width: 100%;
+            max-width: 600px;
+            margin: auto;
+            padding-top: 30px;
+        }
+
+        .chat-box {
+            display: flex;
+            flex-direction: column;
+            height: 70vh;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 15px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            position: relative;
+        }
+
+        .recommendations {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            font-size: 16px;
+            color: #555;
+            height: 100%;
+        }
+
+        .recommendation-item {
+            cursor: pointer;
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 20px;
+            text-align: center;
+            width: fit-content;
+            transition: background-color 0.3s;
+        }
+
+        .recommendation-item:hover {
+            background-color: #0056b3;
+        }
+
+        .message {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+            white-space: pre-wrap; /* Ensures line breaks are respected */
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background: #cce5ff;
+            color: #333;
+            padding: 10px;
+            border-radius: 8px;
+            max-width: 70%;
+        }
+
+        .ai-message {
+            align-self: flex-start;
+            background: #e0e0e0;
+            color: #333;
+            padding: 10px;
+            border-radius: 8px;
+            max-width: 70%;
+            white-space: pre-wrap; /* Makes lists appear in line breaks */
+        }
+
+        .input-container {
+            display: flex;
+            width: 100%;
+            margin-top: auto;
+        }
+
+        #topic-input {
+            flex-grow: 1;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 8px 0 0 8px;
+        }
+
+        #send-button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 0 8px 8px 0;
+            transition: background-color 0.3s;
+        }
+
+        #send-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
-    <!-- Main container for the homepage -->
+    <!-- Navigation bar at the top of the page -->
+    <div class="navbar">
+        <a href="homepage.html">InnovativeAI</a>
+        <div class="nav-right">
+            <a href="profile.html">Profile</a>
+            <a href="index.html" onclick="logout()">Logout</a>
+        </div>
+    </div>
+
     <div class="container">
         <header>
-            <h1>InnovativeAI</h1> <!-- Page Header -->
+            <h1>Welcome to InnovativeAI</h1>
         </header>
         
-        <main>
-            <!-- Form for AI suggestions -->
-            <form id="suggestion-form">
-                <!-- Topic input field -->
-                <input type="text" id="topic-input" placeholder="Enter a topic..." required>
-
-                <!-- Submit button -->
-                <button type="submit">Get Suggestions</button>
-            </form>
-            
-            <!-- Button to navigate to Profile page -->
-            <div class="button-container">
-                <button onclick="navigateToProfile()">My Profile</button>
+        <div class="chat-box" id="chat-box">
+            <!-- Initial recommendations -->
+            <div id="recommendations" class="recommendations">
+                <div class="recommendation-item" onclick="useRecommendation('Tell me a joke.')">Tell me a joke</div>
+                <div class="recommendation-item" onclick="useRecommendation('Explain quantum computing in simple terms.')">Explain quantum computing in simple terms</div>
+                <div class="recommendation-item" onclick="useRecommendation('What are some popular programming languages?')">What are some popular programming languages?</div>
+                <div class="recommendation-item" onclick="useRecommendation('How does machine learning work?')">How does machine learning work?</div>
+                <div class="recommendation-item" onclick="useRecommendation('Give me a motivational quote')">Give me a motivational quote</div>
             </div>
-        </main>
+        </div>
+
+        <div class="input-container">
+            <input type="text" id="topic-input" placeholder="Ask me anything...">
+            <button id="send-button">Send</button>
+        </div>
     </div>
-    
-    <!-- JavaScript for handling suggestions and navigation -->
-    <script src="app.js"></script>
+
     <script>
-        function navigateToProfile() {
-            window.location.href = 'profile.html'; //
+        const chatBox = document.getElementById('chat-box');
+        const topicInput = document.getElementById('topic-input');
+        const sendButton = document.getElementById('send-button');
+        const recommendationsContainer = document.getElementById('recommendations');
+
+        // Function to display messages in chat
+        function addMessage(content, isUser = true) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', isUser ? 'user-message' : 'ai-message');
+            messageElement.textContent = content;
+            chatBox.appendChild(messageElement);
+            chatBox.scrollTop = chatBox.scrollHeight;
         }
+
+        // Send message to server
+        async function sendMessage() {
+            const topic = topicInput.value.trim();
+            if (!topic) return;
+
+            hideRecommendations();
+
+            addMessage(topic);
+
+            topicInput.value = '';
+
+            try {
+                const response = await fetch('/getSuggestions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ topic }),
+                });
+                const data = await response.json();
+
+                if (response.ok) {
+                    addMessage(formatAIMessage(data.suggestions), false);
+                } else {
+                    addMessage("Error: " + data.error, false);
+                }
+            } catch (error) {
+                addMessage("Error processing request", false);
+            }
+        }
+
+        // Format AI message for lists
+        function formatAIMessage(content) {
+            // Replace any numbers (1., 2., etc.) or bullets with line breaks for formatting
+            return content.replace(/(\d+\.)/g, '\n$1').replace(/•/g, '\n•');
+        }
+
+        // Function to handle logout process
+        function logout() {
+            alert('You have been logged out.');
+            window.location.href = 'index.html';
+        }
+
+        // Function to use a recommendation
+        function useRecommendation(text) {
+            topicInput.value = text;
+            sendMessage();
+        }
+
+        // Function to hide recommendations
+        function hideRecommendations() {
+            if (recommendationsContainer) {
+                recommendationsContainer.style.display = 'none';
+            }
+        }
+
+        // Event listeners
+        sendButton.addEventListener('click', sendMessage);
+        topicInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
     </script>
 </body>
 </html>
