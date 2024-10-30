@@ -1,19 +1,22 @@
 {
   "name": "innovativeai",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "InnovativeAI - A conversational AI project",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["AI", "Express", "MongoDB", "Node.js"],
+  "author": "Your Name",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
     "express": "^4.19.2",
-    "mongoose": "^8.6.0"
+    "mongoose": "^8.6.0",
+    "openai": "^4.0.0"  // Added OpenAI dependency
   },
-  "description": ""
+  "engines": {
+    "node": ">=14.0.0"
+  }
 }
