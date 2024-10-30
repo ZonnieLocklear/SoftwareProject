@@ -1,11 +1,20 @@
-require('dotenv').config(); // Load environment variables from .env file
+// Import environment variables using ES module syntax
+import dotenv from 'dotenv';
+dotenv.config();
 
-const express = require('express');
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const bodyParser = require('body-parser');
-const nodemailer = require('nodemailer');
-const crypto = require('crypto');
+import express from 'express';
+import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
+import bodyParser from 'body-parser';
+import nodemailer from 'nodemailer';
+import crypto from 'crypto';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import OpenAI from 'openai';
+
+// Define __dirname in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -15,7 +24,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 // Serve static files
-app.use(express.static(__dirname));  // Serves all static files (HTML, CSS, JS) in the root directory
+app.use(express.static(__dirname)); // Serves all static files (HTML, CSS, JS) in the root directory
 
 // MongoDB connection using environment variable
 const uri = process.env.MONGODB_URI;
@@ -28,8 +37,8 @@ mongoose.connect(uri, {
 
 // User schema and model
 const userSchema = new mongoose.Schema({
-    username: { type: String, required: true, unique: true },  // Unique username
-    email: { type: String, required: true, unique: true },     // Unique email
+    username: { type: String, required: true, unique: true }, // Unique username
+    email: { type: String, required: true, unique: true },    // Unique email
     password: { type: String, required: true },
     resetToken: String,
     resetTokenExpiration: Date,
@@ -37,7 +46,7 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model('User', userSchema);
 
-// Nodemailer configuration
+// Nodemailer configuration for password reset
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -46,46 +55,35 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-// Routes
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/index.html');  // Serve the main HTML file
-});
-
+// Registration route
 app.post('/register', async (req, res) => {
     const { username, email, password } = req.body;
-    console.log('Received registration data:', { username, email, password });  // Log the incoming data
 
     if (!username || !email || !password) {
         return res.status(400).json({ error: 'Username, email, and password are required' });
     }
 
     try {
-        // Check if username or email already exists
         const existingUser = await User.findOne({ $or: [{ username }, { email }] });
         if (existingUser) {
             return res.status(400).json({ error: 'User with this username or email already exists' });
         }
 
-        // Hash the password
         const hashedPassword = await bcrypt.hash(password, 10);
-
-        // Create a new user
         const newUser = new User({ username, email, password: hashedPassword });
         await newUser.save();
 
         res.status(201).json({ message: 'User registered successfully' });
     } catch (error) {
-        console.error('Error registering user:', error.message);  // More detailed error logging
         res.status(500).json({ error: `Error registering user: ${error.message}` });
     }
 });
 
+// Login route
 app.post('/login', async (req, res) => {
     const { username, password } = req.body;
-    console.log('Received login data:', { username, password });  // Log the incoming data
 
     try {
-        // Find user by either username or email
         const user = await User.findOne({ $or: [{ username }, { email: username }] });
         if (!user) return res.status(400).json({ error: 'User not found' });
 
@@ -94,15 +92,14 @@ app.post('/login', async (req, res) => {
 
         res.json({ message: 'User logged in successfully', success: true, redirectUrl: '/Homepage.html' });
     } catch (error) {
-        console.error('Error logging in user:', error.message);  // More detailed error logging
+        console.error('Error logging in user:', error.message);
         res.status(500).json({ error: 'Error logging in user' });
     }
 });
 
-// Forgot Password Endpoint
+// Forgot Password route
 app.post('/forgot-password', async (req, res) => {
     const { email } = req.body;
-    console.log('Received forgot password request for email:', email);  // Log the incoming data
 
     try {
         const user = await User.findOne({ email });
@@ -110,13 +107,11 @@ app.post('/forgot-password', async (req, res) => {
             return res.status(404).json({ error: 'Email not found' });
         }
 
-        // Generate a reset token
         const token = crypto.randomBytes(32).toString('hex');
         user.resetToken = token;
         user.resetTokenExpiration = Date.now() + 3600000; // Token valid for 1 hour
         await user.save();
 
-        // Send reset email
         const resetUrl = `http://localhost:${PORT}/reset-password?token=${token}`;
         await transporter.sendMail({
             to: email,
@@ -132,9 +127,9 @@ app.post('/forgot-password', async (req, res) => {
     }
 });
 
-// Reset Password Endpoint
+// Reset Password route
 app.get('/reset-password', (req, res) => {
-    res.sendFile(__dirname + '/reset-password.html');  // Serve the reset password page
+    res.sendFile(__dirname + '/reset-password.html'); // Serve the reset password page
 });
 
 app.post('/reset-password', async (req, res) => {
@@ -145,7 +140,6 @@ app.post('/reset-password', async (req, res) => {
             return res.status(400).json({ error: 'Invalid or expired token' });
         }
 
-        // Hash the new password and update the user record
         const hashedPassword = await bcrypt.hash(password, 10);
         user.password = hashedPassword;
         user.resetToken = undefined;
@@ -156,6 +150,56 @@ app.post('/reset-password', async (req, res) => {
     } catch (error) {
         console.error('Error resetting password:', error.message);
         res.status(500).json({ error: 'Error resetting password' });
+    }
+});
+
+// OpenAI API setup with conversation memory
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY, // Use the OpenAI API key from environment variables
+});
+
+const conversationMemory = {}; // In-memory conversation storage
+
+// Endpoint to handle AI suggestions using OpenAI (chat-based)
+app.post('/getSuggestions', async (req, res) => {
+    const userId = req.body.userId || 'defaultUser'; // Replace with real user ID for a multi-user system
+    const topic = req.body.topic;
+
+    if (!topic) {
+        return res.status(400).json({ error: 'Please provide a topic or question' });
+    }
+
+    // Initialize or retrieve user-specific conversation history, limiting to last two messages
+    if (!conversationMemory[userId]) conversationMemory[userId] = [
+        { role: "system", content: "You are InnovativeAI, a helpful assistant." }
+    ];
+    const userMessages = conversationMemory[userId].slice(-2); // Get last 2 messages
+
+    // Add new user message to the conversation
+    userMessages.push({ role: "user", content: topic });
+
+    try {
+        // Send message to OpenAI with context
+        const response = await openai.chat.completions.create({
+            model: "gpt-4",
+            messages: userMessages,
+            temperature: 1,
+            max_tokens: 150,
+            top_p: 1,
+            frequency_penalty: 0,
+            presence_penalty: 0
+        });
+
+        const aiResponse = response.choices[0].message.content.trim();
+
+        // Save conversation history by adding AI's response
+        conversationMemory[userId].push({ role: "user", content: topic });
+        conversationMemory[userId].push({ role: "assistant", content: aiResponse });
+
+        res.json({ suggestions: aiResponse });
+    } catch (error) {
+        console.error('Error with OpenAI API:', error.message);
+        res.status(500).json({ error: 'Error processing AI request' });
     }
 });
 
