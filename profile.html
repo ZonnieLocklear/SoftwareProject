@@ -4,43 +4,237 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile - InnovativeAI</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Link to your CSS file -->
-</head>
-<body>
-    <div class="container">
-        <header>
-            <h1>Your Profile</h1>
-        </header>
-        <main>
-            <!-- Profile form -->
-            <form id="profile-form" action="http://localhost:3000/profile" method="POST" onsubmit="return validateProfileForm()">
-                <input type="text" id="profile-username" name="username" placeholder="Username" required readonly> <!-- Read-only username -->
-                <input type="email" id="profile-email" name="email" placeholder="Email" required>
-                <input type="password" id="profile-new-password" name="newPassword" placeholder="New Password (optional)">
-                <button type="submit">Update Profile</button>
-            </form>
-
-            <!-- Link to Logout or go back to homepage -->
-            <p><a href="index.html">Logout</a> | <a href="homepage.html">Go back to Homepage</a></p>
-        </main>
-    </div>
-
-    <!-- JavaScript for form validation -->
-    <script>
-        function validateProfileForm() {
-            var email = document.getElementById("profile-email").value;
-            if (email == "") {
-                alert("Email is required.");
-                return false;
-            }
-            return true;
+    <!-- Link to external CSS for styling -->
+    <link rel="stylesheet" href="styles.css"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css"> <!-- Bootstrap for styling -->
+    <style>
+        /* Additional custom styles for profile page enhancements */
+        .profile-container {
+            max-width: 1000px;
+            margin: 160px auto 20px; /* Increased top margin to avoid overlap with the navigation bar */
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #f9f9f9;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
         }
 
-        // Example of setting username from localStorage or session storage
+        .profile-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .profile-picture img {
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            margin-bottom: 10px;
+            border: 5px solid #ddd;
+        }
+
+        .profile-picture button {
+            margin-top: 10px;
+        }
+
+        .card {
+            margin-top: 20px; /* Adjusted margin for neat spacing */
+        }
+
+        .btn-custom {
+            background-color: #00b4db;
+            color: #fff;
+            border: none;
+            transition: background-color 0.3s;
+        }
+
+        .btn-custom:hover {
+            background-color: #0083b0;
+        }
+
+        .navbar {
+            background-color: #333;
+            position: fixed; /* Use fixed to keep the navigation bar on top */
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+            padding: 15px;
+        }
+
+        .navbar a:hover {
+            background-color: #575757;
+            border-radius: 5px;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            padding-left: 20px;
+        }
+
+        .navbar-nav {
+            margin-right: 20px;
+        }
+
+        .navbar-nav a {
+            padding: 15px 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation bar at the top of the page -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <a class="navbar-brand" href="homepage.html">InnovativeAI</a>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="homepage.html">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="profile.html">Profile</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="index.html" onclick="logout()">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="profile-container container">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <h1>Welcome, <span id="user-greeting">User</span>!</h1> <!-- Dynamic greeting message -->
+            <div class="profile-picture">
+                <img id="profile-picture" src="default-profile.png" alt="Profile Picture"> <!-- Default profile picture -->
+                <button class="btn btn-custom btn-sm" onclick="document.getElementById('upload-picture').click();">Change Picture</button>
+                <input type="file" id="upload-picture" accept="image/*" style="display: none;"> <!-- File input for profile picture upload -->
+            </div>
+        </div>
+
+        <!-- Profile Form Card -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Profile Details</h2>
+            </div>
+            <div class="card-body">
+                <form id="profile-form" action="http://localhost:3000/profile" method="POST" onsubmit="return validateProfileForm()">
+                    <div class="mb-3">
+                        <label for="profile-username" class="form-label">Username</label>
+                        <input type="text" id="profile-username" name="username" class="form-control" placeholder="Username" required readonly> <!-- Read-only username field -->
+                    </div>
+                    <div class="mb-3">
+                        <label for="profile-email" class="form-label">Email</label>
+                        <input type="email" id="profile-email" name="email" class="form-control" placeholder="Email" required> <!-- Email input field -->
+                    </div>
+                    <div class="mb-3">
+                        <label for="profile-new-password" class="form-label">New Password </label>
+                        <input type="password" id="profile-new-password" name="newPassword" class="form-control" placeholder="New Password (optional)"> <!-- Optional password field -->
+                    </div>
+                    <div class="mb-3">
+                        <label for="profile-bio" class="form-label">Bio </label>
+                        <textarea id="profile-bio" name="bio" class="form-control" placeholder="Add a bio " rows="3"></textarea> <!-- Text area for user bio -->
+                    </div>
+                    <div class="mb-3">
+                        <label for="profile-phone" class="form-label">Phone Number</label>
+                        <input type="tel" id="profile-phone" name="phone" class="form-control" placeholder="Phone Number (optional)" pattern="[0-9]{10}"> <!-- Optional phone number input with validation pattern -->
+                    </div>
+                    <button type="submit" class="btn btn-custom">Save Changes</button> <!-- Submit button for profile form -->
+                </form>
+            </div>
+        </div>
+
+        <!-- Security Settings Card -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Security Settings</h2>
+            </div>
+            <div class="card-body">
+                <button class="btn btn-custom" onclick="toggleTwoFactorAuth()">Enable Two-Factor Authentication</button> <!-- Button to toggle two-factor authentication -->
+                <p id="two-factor-status" class="mt-3">Two-Factor Authentication is currently disabled.</p> <!-- Status message for two-factor authentication -->
+            </div>
+        </div>
+
+        <!-- Logout or go back to homepage links -->
+        <div class="text-center mt-4">
+            <a href="index.html" class="btn btn-secondary" onclick="logout()">Logout</a>
+            <a href="homepage.html" class="btn btn-secondary">Homepage</a>
+        </div>
+    </div>
+
+    <!-- JavaScript for form validation and dynamic content -->
+    <script>
+        // Function to validate the profile form before submission
+        function validateProfileForm() {
+            var email = document.getElementById("profile-email").value;
+            var phone = document.getElementById("profile-phone").value;
+            var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; // Regular expression for email validation
+            var phonePattern = /^[0-9]{10}$/; // Regular expression for 10-digit phone number validation
+
+            if (!emailPattern.test(email)) {
+                alert("Please enter a valid email address."); // Alert if email is not valid
+                return false; // Prevent form submission
+            }
+
+            if (phone && !phonePattern.test(phone)) {
+                alert("Please enter a valid 10-digit phone number."); // Alert if phone number is not valid
+                return false; // Prevent form submission
+            }
+            
+            return true; // Allow form submission if validations pass
+        }
+
+        // Function to populate username and profile picture from local storage or server data
         document.addEventListener("DOMContentLoaded", function() {
-            var username = "YourUsername"; // Replace with actual data
-            document.getElementById("profile-username").value = username;
+            var user = JSON.parse(localStorage.getItem('user')); // Retrieve the user object from localStorage
+            if (user) {
+                document.getElementById("profile-username").value = user.username; // Set the username in the form
+                document.getElementById("user-greeting").textContent = user.username; // Set the greeting message
+                document.getElementById("profile-email").value = user.email; // Set the email in the form
+                document.getElementById("profile-picture").src = user.profilePicUrl || 'default-profile.png'; // Set the profile picture source
+            }
         });
+
+        // Function to handle profile picture upload and preview
+        document.getElementById("upload-picture").addEventListener("change", function() {
+            var file = this.files[0];
+            if (file) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById("profile-picture").src = e.target.result; // Update the profile picture preview
+                    // Save updated picture to local storage
+                    var user = JSON.parse(localStorage.getItem('user'));
+                    if (user) {
+                        user.profilePicUrl = e.target.result;
+                        localStorage.setItem('user', JSON.stringify(user));
+                    }
+                }
+                reader.readAsDataURL(file); // Read the selected file as a data URL
+            }
+        });
+
+        // Function to toggle two-factor authentication status
+        function toggleTwoFactorAuth() {
+            var status = document.getElementById("two-factor-status"); // Get the status element
+            if (status.textContent.includes("disabled")) {
+                status.textContent = "Two-Factor Authentication is currently enabled."; // Update status message
+                alert("Two-Factor Authentication has been enabled."); // Alert the user
+            } else {
+                status.textContent = "Two-Factor Authentication is currently disabled."; // Update status message
+                alert("Two-Factor Authentication has been disabled."); // Alert the user
+            }
+        }
+
+        // Function to handle user logout and clear local storage
+        function logout() {
+            localStorage.removeItem('user'); // Remove user data from localStorage
+            window.location.href = 'index.html'; // Redirect to login page
+        }
     </script>
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
