@@ -5,8 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>InnovativeAI</title>
     <link rel="stylesheet" href="styles.css">
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+            if (!isLoggedIn) {
+                alert('Access denied. Please log in.');
+                window.location.href = 'index.html'; // Redirects to the login page
+            }
+        });
+    </script>
     <style>
-        /* Existing styles */
+        /* Updated styles */
         body, html {
             height: 100%;
             display: flex;
@@ -106,7 +115,7 @@
             padding: 10px;
             border-radius: 8px;
             max-width: 70%;
-            white-space: pre-wrap; /* Makes lists appear in line breaks */
+            white-space: pre-wrap;
         }
 
         .input-container {
@@ -136,6 +145,8 @@
         #send-button:hover {
             background-color: #0056b3;
         }
+
+        
     </style>
 </head>
 <body>
@@ -143,6 +154,7 @@
     <div class="navbar">
         <a href="homepage.html">InnovativeAI</a>
         <div class="nav-right">
+            <a href="flashcards-quiz.html">Flashcards</a> <!-- New Flashcards button -->
             <a href="profile.html">Profile</a>
             <a href="index.html" onclick="logout()">Logout</a>
         </div>
@@ -168,6 +180,8 @@
             <input type="text" id="topic-input" placeholder="Ask me anything...">
             <button id="send-button">Send</button>
         </div>
+
+        
     </div>
 
     <script>
@@ -218,8 +232,7 @@
 
         // Format AI message for lists
         function formatAIMessage(content) {
-            // Replace any numbers (1., 2., etc.) or bullets with line breaks for formatting
-            return content.replace(/(\d+\.)/g, '\n$1').replace(/•/g, '\n•');
+            return content.replace(/(\d+\.)/g, '\n$1').replace(/\u2022/g, '\n\u2022');
         }
 
         // Function to handle logout process
@@ -246,6 +259,9 @@
         topicInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') sendMessage();
         });
+
+    
     </script>
+
 </body>
 </html>
