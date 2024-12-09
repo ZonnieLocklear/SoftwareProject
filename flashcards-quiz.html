@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InnovativeAI Flashcard Study Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 1rem;
+        }
+        main {
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input, .form-group textarea, .form-group button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .flashcard {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 10px;
+            text-align: center;
+            cursor: pointer;
+            position: relative;
+        }
+        .hidden {
+            display: none;
+        }
+        .button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        .delete-button {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            padding: 5px 10px;
+            font-size: 12px;
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #333;
+            padding: 10px;
+            color: white;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 8px;
+        }
+        .quiz-container {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navigation bar at the top of the page -->
+<div class="navbar">
+    <a href="homepage.html">InnovativeAI</a>
+    <div class="nav-right">
+        <a href="flashcards-quiz.html">Flashcards</a>
+        <a href="profile.html">Profile</a>
+        <a href="index.html" onclick="logout()">Logout</a>
+    </div>
+</div>
+<header>
+    <h1>Flashcard Quiz</h1>
+</header>
+<main>
+    <div class="container">
+        <h2>Create a Flashcard</h2>
+        <div class="form-group">
+            <label for="term">Term</label>
+            <input type="text" id="term" placeholder="Enter the term">
+        </div>
+        <div class="form-group">
+            <label for="definition">Definition</label>
+            <textarea id="definition" placeholder="Enter the definition"></textarea>
+        </div>
+        <div class="form-group">
+            <button id="addFlashcard" class="button">Add Flashcard</button>
+        </div>
+    </div>
+    <div class="container">
+        <h2>Study Flashcards</h2>
+        <div id="flashcards">
+            <p>No flashcards available. Add some above!</p>
+        </div>
+    </div>
+    <div class="container">
+        <h2>Quiz Yourself</h2>
+        <button id="startQuiz" class="button">Start Quiz</button>
+        <div id="quiz" class="hidden">
+            <p id="quizQuestion"></p>
+            <input type="text" id="quizAnswer" placeholder="Your answer">
+            <button id="submitAnswer" class="button">Submit</button>
+            <p id="quizFeedback"></p>
+        </div>
+    </div>
+</main>
+
+<script>
+    const termInput = document.getElementById('term');
+    const definitionInput = document.getElementById('definition');
+    const addFlashcardButton = document.getElementById('addFlashcard');
+    const flashcardsDiv = document.getElementById('flashcards');
+    const startQuizButton = document.getElementById('startQuiz');
+    const quizDiv = document.getElementById('quiz');
+
+    let flashcards = [];
+
+    // Fetch flashcards from the server
+    async function fetchFlashcards() {
+        try {
+            const response = await fetch('/getFlashcards');
+            if (response.ok) {
+                const data = await response.json();
+                flashcards = data.flashcards;
+                renderFlashcards(flashcards);
+            } else {
+                flashcardsDiv.innerHTML = '<p>Failed to load flashcards. Please try again later.</p>';
+            }
+        } catch (error) {
+            console.error('Error fetching flashcards:', error);
+            flashcardsDiv.innerHTML = '<p>Failed to load flashcards. Please try again later.</p>';
+        }
+    }
+
+    // Render flashcards
+    function renderFlashcards(flashcardsData) {
+        flashcardsDiv.innerHTML = '';
+        flashcardsData.forEach((flashcard) => {
+            const card = document.createElement('div');
+            card.className = 'flashcard';
+            card.textContent = flashcard.term;
+
+            // Delete button
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.className = 'delete-button';
+            deleteButton.addEventListener('click', async (e) => {
+                e.stopPropagation(); // Prevent toggle event
+                try {
+                    const response = await fetch(`/deleteFlashcard/${flashcard._id}`, {
+                        method: 'DELETE',
+                    });
+                    if (response.ok) {
+                        alert('Flashcard deleted successfully!');
+                        fetchFlashcards(); // Refresh flashcards
+                    } else {
+                        alert('Failed to delete flashcard.');
+                    }
+                } catch (error) {
+                    console.error('Error deleting flashcard:', error);
+                }
+            });
+
+            // Toggle term/definition on click
+            card.addEventListener('click', () => {
+                card.textContent = card.textContent === flashcard.term
+                    ? flashcard.definition
+                    : flashcard.term;
+            });
+
+            // Append delete button to card
+            card.appendChild(deleteButton);
+            flashcardsDiv.appendChild(card);
+        });
+
+        if (flashcardsData.length === 0) {
+            flashcardsDiv.innerHTML = '<p>No flashcards available. Add some above!</p>';
+        }
+    }
+
+    // Add a new flashcard
+    addFlashcardButton.addEventListener('click', async () => {
+        const term = termInput.value.trim();
+        const definition = definitionInput.value.trim();
+
+        if (term && definition) {
+            try {
+                const response = await fetch('/flashcards', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ term, definition }),
+                });
+
+                if (response.ok) {
+                    alert('Flashcard added successfully!');
+                    termInput.value = '';
+                    definitionInput.value = '';
+                    fetchFlashcards(); // Refresh flashcards
+                } else {
+                    alert('Failed to add flashcard.');
+                }
+            } catch (error) {
+                console.error('Error adding flashcard:', error);
+            }
+        } else {
+            alert('Please fill in both fields.');
+        }
+    });
+
+
+    // Load flashcards on page load
+    document.addEventListener('DOMContentLoaded', fetchFlashcards);
+</script>
+</body>
+</html>
