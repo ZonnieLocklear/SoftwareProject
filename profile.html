@@ -93,10 +93,7 @@
             <ul class="navbar-nav ms-auto">
                 <li class="nav-item">
                     <a class="nav-link" href="homepage.html">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="profile.html">Profile</a>
-                </li>
+                
                 <li class="nav-item">
                     <a class="nav-link" href="index.html" onclick="logout()">Logout</a>
                 </li>
@@ -167,6 +164,15 @@
 
     <!-- JavaScript for form validation and dynamic content -->
     <script>
+    document.addEventListener('DOMContentLoaded', () => {
+    const isLoggedIn = sessionStorage.getItem('isLoggedIn');
+
+    if (!isLoggedIn || isLoggedIn !== 'true') {
+        alert('Access denied. Please log in.');
+        window.location.href = '/index.html'; // Redirect to login page
+    }
+});
+
         // Function to validate the profile form before submission
         function validateProfileForm() {
             var email = document.getElementById("profile-email").value;
